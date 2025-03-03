@@ -1,4 +1,4 @@
-import { Client, Events, MessageFlags, GatewayIntentBits } from "discord.js";
+import { Client, Events, GatewayIntentBits } from "discord.js";
 import { OpenAI } from "openai";
 
 const TOKEN = process.env["DISCORD_BOT_TOKEN"];
@@ -6,7 +6,7 @@ const openai = new OpenAI({ apiKey: process.env["OPEN_AI_API_KEY"] });
 
 //Global variables and constants
 const RATE_LIMITING = false;
-const MESSAGE_FETCH_LIMIT = 10;
+const MESSAGE_FETCH_LIMIT = 5;
 let rateLimitingTime = 0; //Ex : 2H or 30M
 let blacklist = [];
 let ignoredUsers = [];
@@ -28,7 +28,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
   //TODO Accept argument to decide how many messages to summarize
   if (interaction.commandName === "lazy") {
-    //Fetch messages and filters out the commandas and bot messages
+    //Fetch messages and filters out commands and bot messages
     let allMessages = await interaction.channel.messages.fetch({
       limit: MESSAGE_FETCH_LIMIT,
     });
@@ -37,7 +37,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
       (message) => !message.author.bot && !message.content.startsWith("/"),
     );
 
-    //Refactor and concatenate the messages authors for ChatGPT
+    //Refactor and concatenate the messages authors and the channel's title
     let messagesString = "[CHANNEL NAME : " + interaction.channel.name + "]\n";
 
     lastMessages.reverse().map((message) => {
@@ -45,7 +45,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
         "[" + message.author.username + "] " + message.content + "\n";
     });
 
-    //TODO OpenAI's API call for the summary
+    //OpenAI's API call for the summary
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [
