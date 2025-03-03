@@ -1,4 +1,4 @@
-import { Client, Events, GatewayIntentBits } from "discord.js";
+import { Client, Events, MessageFlags, GatewayIntentBits } from "discord.js";
 import { OpenAI } from "openai";
 
 const TOKEN = process.env["DISCORD_BOT_TOKEN"];
@@ -6,7 +6,7 @@ const openai = new OpenAI({ apiKey: process.env["OPEN_AI_API_KEY"] });
 
 //Global variables and constants
 const RATE_LIMITING = false;
-const MESSAGE_FETCH_LIMIT = 5;
+const MESSAGE_FETCH_LIMIT = 10;
 let rateLimitingTime = 0; //Ex : 2H or 30M
 let blacklist = [];
 let ignoredUsers = [];
@@ -20,7 +20,7 @@ const client = new Client({
 client.on(Events.ClientReady, (readyClient) => {
   console.log(`Logged in as ${readyClient.user.tag}!`);
 
-  //TODO fetch blacklisted users
+  //TODO fetch blacklisted and ignored users
 });
 
 client.on(Events.InteractionCreate, async (interaction) => {
@@ -28,7 +28,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
   //TODO Accept argument to decide how many messages to summarize
   if (interaction.commandName === "lazy") {
-    //Fetch the last n messages and filters out all the commandas and messages from the bot
+    //Fetch messages and filters out the commandas and bot messages
     let allMessages = await interaction.channel.messages.fetch({
       limit: MESSAGE_FETCH_LIMIT,
     });
@@ -52,7 +52,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
         {
           role: "developer",
           content:
-            'You are a helpful assistant that summarizes the last n number of messages from a discord channel. You are provided with the channel name at the beginning of the transcript for you to have basic context. You are to provide useful information about topics discussed, questions, events, important topics or even debates. If the channel name or discussion revolves around programming, please provide relevant information such as updates, bugs, problems, changes, or questions that might be useful for users who have been absent for a long time to know about. When giving the summary, do not introduce the user with "There is a user named..." simply name them instead.',
+            'You are a helpful assistant that summarizes the last n number of messages from a discord channel for users who have been absent for a long time. You are provided with the channel name at the beginning of the transcript for you to have basic context. You are to provide useful information about topics discussed, questions, events, important topics or even debates in a concise way and in the form of bullet points. If the channel name or discussion revolves around programming, please provide relevant information such as updates, bugs, problems, changes, or questions that might be useful. When giving the summary, do not introduce the user with "A user named..." simply name them instead.',
         },
         {
           role: "user",
@@ -62,9 +62,11 @@ client.on(Events.InteractionCreate, async (interaction) => {
       store: false,
     });
 
-    await interaction.reply(
-      `[TEST] ChatGPT's summary:\n${completion.choices[0].message.content}`,
-    );
+    //Return the summary
+    //TODO CHOP THE MESSAGE (WHEN message.length > 2000) INTO MULTIPLE CHUNKS OF MESSAGES
+    await interaction.deferReply();
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+    await interaction.followUp(completion.choices[0].message.content);
   }
 
   /*
