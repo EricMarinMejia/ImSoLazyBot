@@ -24,12 +24,12 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
   //TODO Accept argument to decide how many messages to summarize
   if (interaction.commandName === "lazy") {
-    //Fetch last 100 messages and filter them
-    let lastMessages = await interaction.channel.messages.fetch({ limit: 5 });
-
-    lastMessages = lastMessages.filter(
-      (message) => !message.author.bot && !message.content.startsWith("/"),
-    );
+    //Fetch a batch of messages to filter
+    let allMessages = await interaction.channel.messages.fetch({ limit: 100 });
+    
+    let lastMessages = Array.from(allMessages.values())
+      .filter((message) => !message.author.bot && !message.content.startsWith("/"))
+      .slice(0, 100); // Get up to 100 messages that meet the criteria
 
     //Refactor and concatenate the messages authors for ChatGPT
     let messagesString = "";
