@@ -22,12 +22,14 @@ client.on(Events.ClientReady, (readyClient) => {
 client.on(Events.InteractionCreate, async (interaction) => {
   if (!interaction.isChatInputCommand()) return;
 
+  //TODO Accept argument to decide how many messages to summarize
   if (interaction.commandName === "lazy") {
-    //Fetch last 5 messages
+    //Fetch last 100 messages and filter them
     let lastMessages = await interaction.channel.messages.fetch({ limit: 5 });
 
-    //TODO filter messages from the bot and commands
-    //TODO Get argument to decide how many messages to summarize
+    lastMessages = lastMessages.filter(
+      (message) => !message.author.bot && !message.content.startsWith("/"),
+    );
 
     //Refactor and concatenate the messages authors for ChatGPT
     let messagesString = "";
@@ -81,7 +83,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
   summoned again.
   ex : /ratelimit => "You can summon /lazy again in 2 hours and 30 minutes.""
   */
-}
 });
 
 client.login(TOKEN);
