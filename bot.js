@@ -6,6 +6,7 @@ const TOKEN = process.env["DISCORD_BOT_TOKEN"];
 const RATE_LIMITING = false;
 let rateLimitingTime = 0; //Ex : 2H or 30M
 let blacklist = [];
+let ignoredUsers = [];
 
 //Intents
 const client = new Client({
@@ -24,12 +25,12 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
   //TODO Accept argument to decide how many messages to summarize
   if (interaction.commandName === "lazy") {
-    //Fetch a batch of messages to filter
-    let allMessages = await interaction.channel.messages.fetch({ limit: 100 });
-    
-    let lastMessages = Array.from(allMessages.values())
-      .filter((message) => !message.author.bot && !message.content.startsWith("/"))
-      .slice(0, 100); // Get up to 100 messages that meet the criteria
+    //Fetch the last n messages and filters out all the commandas and messages from the bot
+    let allMessages = await interaction.channel.messages.fetch({ limit: 5 });
+
+    let lastMessages = Array.from(allMessages.values()).filter(
+      (message) => !message.author.bot && !message.content.startsWith("/"),
+    );
 
     //Refactor and concatenate the messages authors for ChatGPT
     let messagesString = "";
