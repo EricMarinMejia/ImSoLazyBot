@@ -1,9 +1,12 @@
 import { Client, Events, GatewayIntentBits } from "discord.js";
+import { OpenAI } from "openai";
 
 const TOKEN = process.env["DISCORD_BOT_TOKEN"];
+const openai = new OpenAI({ apiKey: process.env["OPEN_AI_API_KEY"] });
 
 //Global variables and constants
 const RATE_LIMITING = false;
+const MESSAGE_FETCH_LIMIT = 5;
 let rateLimitingTime = 0; //Ex : 2H or 30M
 let blacklist = [];
 let ignoredUsers = [];
@@ -26,23 +29,42 @@ client.on(Events.InteractionCreate, async (interaction) => {
   //TODO Accept argument to decide how many messages to summarize
   if (interaction.commandName === "lazy") {
     //Fetch the last n messages and filters out all the commandas and messages from the bot
-    let allMessages = await interaction.channel.messages.fetch({ limit: 5 });
+    let allMessages = await interaction.channel.messages.fetch({
+      limit: MESSAGE_FETCH_LIMIT,
+    });
 
     let lastMessages = Array.from(allMessages.values()).filter(
       (message) => !message.author.bot && !message.content.startsWith("/"),
     );
 
     //Refactor and concatenate the messages authors for ChatGPT
-    let messagesString = "";
+    let messagesString = "[CHANNEL NAME : " + interaction.channel.name + "]\n";
 
     lastMessages.reverse().map((message) => {
       messagesString +=
         "[" + message.author.username + "] " + message.content + "\n";
     });
 
-    await interaction.reply(`Last 5 messages:\n${messagesString}`);
+    //TODO OpenAI's API call for the summary
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "developer",
+          content:
+            'You are a helpful assistant that summarizes the last n number of messages from a discord channel. You are provided with the channel name at the beginning of the transcript for you to have basic context. You are to provide useful information about topics discussed, questions, events, important topics or even debates. If the channel name or discussion revolves around programming, please provide relevant information such as updates, bugs, problems, changes, or questions that might be useful for users who have been absent for a long time to know about. When giving the summary, do not introduce the user with "There is a user named..." simply name them instead.',
+        },
+        {
+          role: "user",
+          content: messagesString,
+        },
+      ],
+      store: false,
+    });
 
-    //TODO Call ChatGPT API and pass it down some context for the summary
+    await interaction.reply(
+      `[TEST] ChatGPT's summary:\n${completion.choices[0].message.content}`,
+    );
   }
 
   /*
