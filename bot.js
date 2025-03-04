@@ -5,8 +5,9 @@ const TOKEN = process.env["DISCORD_BOT_TOKEN"];
 const openai = new OpenAI({ apiKey: process.env["OPEN_AI_API_KEY"] });
 
 //Global variables and constants
-const RATE_LIMITING = false;
-const MESSAGE_FETCH_LIMIT = 5;
+const LAZY_RATE_LIMITING = false;
+const ASK_RATE_LIMITING = false;
+const MESSAGE_FETCH_LIMIT = 10;
 let rateLimitingTime = 0; //Ex : 2H or 30M
 let blacklist = [];
 let ignoredUsers = [];
