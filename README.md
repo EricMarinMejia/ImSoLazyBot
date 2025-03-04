@@ -2,6 +2,8 @@
 
 ## A fully functional discord bot that allows you to get a quick and precise summary of the messages you missed using OpenAI's API.
 
+<img src="./img/DiscordBot.png" alt="Bot's logo" align="right" width="20%" height="20%">
+
 This project is a discord bot that utilizes OpenAI's API to generate a summary of all the important messages they
 missed on a discord channel. The summary is presented using bullet points to keep things short and clear.
 Primarely designed to get updates on a programming project that me and some friends are currently working on,
@@ -14,6 +16,11 @@ ImSoLazyBot also implements the following features :
 * Prevent a user from using the bot.
 * Exclude all messages from  specific users to be used for the summary.
 * Rate limit the requests for the summary generation.
+
+<p align="center">
+ <img src="./img/Summary example.png"
+   alt="Summary example" width="80%" heigth="80%">
+</p>
 
 # Commands
 * /lazy > Generates a summary of the last n messages.
