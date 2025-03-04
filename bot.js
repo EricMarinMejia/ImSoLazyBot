@@ -7,7 +7,7 @@ const openai = new OpenAI({ apiKey: process.env["OPEN_AI_API_KEY"] });
 //Global variables and constants
 const LAZY_RATE_LIMITING = false;
 const ASK_RATE_LIMITING = false;
-const MESSAGE_FETCH_LIMIT = 10;
+const MESSAGE_FETCH_LIMIT = 100;
 let rateLimitingTime = 0; //Ex : 2H or 30M
 let blacklist = [];
 let ignoredUsers = [];
@@ -38,9 +38,10 @@ client.on(Events.InteractionCreate, async (interaction) => {
       (message) => !message.author.bot && !message.content.startsWith("/"),
     );
 
+    await interaction.deferReply();
+
     //Refactor and concatenate the messages authors and the channel's title
     let messagesString = "[CHANNEL NAME : " + interaction.channel.name + "]\n";
-
     lastMessages.reverse().map((message) => {
       messagesString +=
         "[" + message.author.username + "] " + message.content + "\n";
@@ -63,9 +64,10 @@ client.on(Events.InteractionCreate, async (interaction) => {
       store: false,
     });
 
+    //console.log(completion.choices[0].message.content);
+
     //Return the summary
     //TODO CHOP THE MESSAGE (WHEN message.length > 2000) INTO MULTIPLE CHUNKS OF MESSAGES
-    await interaction.deferReply();
     await new Promise((resolve) => setTimeout(resolve, 5000));
     await interaction.followUp(completion.choices[0].message.content);
   }
