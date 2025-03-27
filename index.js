@@ -15,6 +15,18 @@ const commands = [
     name: "lazy",
     description: "Get a summary of the last 100 messages.",
   },
+  {
+    name: "ask",
+    description: "Ask ChatGPT a question.",
+    options: [
+      {
+        name: "question",
+        description: "The question to ask ChatGPT.",
+        type: 3,
+        required: true,
+      },
+    ],
+  },
 ];
 
 // Token stored inside Replit's Secrets tool but you can also use a .env file. A .env_example file is provided in the repository.

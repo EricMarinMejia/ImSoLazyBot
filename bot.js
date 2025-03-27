@@ -20,7 +20,6 @@ const client = new Client({
 //Log message when bot is ready
 client.on(Events.ClientReady, (readyClient) => {
   console.log(`Logged in as ${readyClient.user.tag}!`);
-
   //TODO fetch blacklisted and ignored users
 });
 
@@ -40,34 +39,23 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
     await interaction.deferReply();
 
-    //Refactor and concatenate the messages authors and the channel's title
+    //Refactor, concatenate the messages authors and the channel's title
     let messagesString = "[CHANNEL NAME : " + interaction.channel.name + "]\n";
     lastMessages.reverse().map((message) => {
       messagesString +=
         "[" + message.author.username + "] " + message.content + "\n";
     });
 
-    //OpenAI's API call for the summary
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        {
-          role: "developer",
-          content:
-            'You are a helpful assistant that summarizes the last n number of messages from a discord channel for users who have been absent for a long time. You are provided with the channel name at the beginning of the transcript for you to have basic context. You are to provide useful information about topics discussed, questions, events, important topics or even debates in a concise way and in the form of bullet points. If the channel name or discussion revolves around programming, please provide relevant information such as updates, bugs, problems, changes, or questions that might be useful. When giving the summary, do not introduce the user with "A user named..." simply name them instead.',
-        },
-        {
-          role: "user",
-          content: messagesString,
-        },
-      ],
-      store: false,
-    });
-
-    //console.log(completion.choices[0].message.content);
-
-    //Return the summary
+    //OpenAI's API call for the summary and return it
     //TODO CHOP THE MESSAGE (WHEN message.length > 2000) INTO MULTIPLE CHUNKS OF MESSAGES
+    const completion = await callOpenAiForResume(messagesString);
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+    await interaction.followUp(completion.choices[0].message.content);
+  } else if (interaction.commandName === "ask") {
+    const question = interaction.options.getString("question");
+    await interaction.deferReply();
+
+    const completion = await callOpenAiForQuestion(question);
     await new Promise((resolve) => setTimeout(resolve, 5000));
     await interaction.followUp(completion.choices[0].message.content);
   }
@@ -112,5 +100,44 @@ client.on(Events.InteractionCreate, async (interaction) => {
   ex : /ratelimit => "You can summon /lazy again in 2 hours and 30 minutes.""
   */
 });
+
+/**
+ * Calls the OpenAI API for the summary
+ */
+async function callOpenAiForResume(messagesString) {
+  return openai.chat.completions.create({
+    model: "gpt-4o-mini",
+    messages: [
+      {
+        role: "developer",
+        content:
+          "You are a helpful assistant summarizing the last n messages from a Discord channel for users who have been absent. You will be provided with the channel name at the beginning of the transcript for context. Generate a concise summary in 3-5 bullet points, focusing only on key topics, questions, updates, and discussions. Avoid unnecessary details or full message rewrites—your goal is to make the summary shorter than the original messages. If the channel involves programming, highlight updates, bug reports, issues, or changes that might be relevant. Use clear, direct language with no fluff. Do not introduce speakers with 'A user named...'; just mention their name when necessary.",
+      },
+      {
+        role: "user",
+        content: messagesString,
+      },
+    ],
+    store: false,
+  });
+}
+
+async function callOpenAiForQuestion(question) {
+  return openai.chat.completions.create({
+    model: "gpt-4o-mini",
+    messages: [
+      {
+        role: "developer",
+        content:
+          "You are a helpful assistant that answers questions and messages from discord users. Try answers short but precise.",
+      },
+      {
+        role: "user",
+        content: question,
+      },
+    ],
+    store: false,
+  });
+}
 
 client.login(TOKEN);
