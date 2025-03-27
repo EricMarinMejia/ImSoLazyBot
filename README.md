@@ -18,8 +18,17 @@ this bot works great to for casual and light-hearted conversations too !
 * Exclude all messages from  specific users to be used for the summary.
 * Rate limit the requests for the summary generation.
 
+<p>/lazy command when asked about the project's status:</p>
 <p align="center">
- <img src="./img/Summary example.png"
+ <img src="./img/Summary.png"
+   alt="Summary example" width="80%" heigth="80%">
+</p>
+
+<br />
+
+<p>/ask command when asked about a different types of jet engines:</p>
+<p align="center">
+ <img src="./img/Ask.png"
    alt="Summary example" width="80%" heigth="80%">
 </p>
 
