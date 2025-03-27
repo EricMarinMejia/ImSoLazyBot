@@ -11,9 +11,9 @@ this bot works great to for casual and light-hearted conversations too !
 <br />ImSoLazyBot implements the following features : 
 
 * Generate a summary of the last n number of messages.
-
-[FEATURES COMING SOON]
 * Ask a question to ChatGPT directly from the discord server.
+  
+[FEATURES COMING SOON]
 * Prevent a user from using the bot.
 * Exclude all messages from  specific users to be used for the summary.
 * Rate limit the requests for the summary generation.
@@ -25,7 +25,7 @@ this bot works great to for casual and light-hearted conversations too !
 
 # Commands
 * /lazy > Generates a summary of the last n messages.
-* /ask > Prompt a question to ChatGPT directly from the discord app.
+* /ask [PROMPT] > Prompt a question to ChatGPT directly from the discord app.
 * /blacklist [USERNAME] > Prevents a user from using the bot and adds them to the blacklist.
 * /whitelist [USERNAME] > Removes a user from the blacklist.
 * /ignore [USERNAME] > Excludes all messages from a specific user when generating the summary.
