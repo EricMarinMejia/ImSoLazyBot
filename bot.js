@@ -129,7 +129,7 @@ async function callOpenAiForQuestion(question) {
       {
         role: "developer",
         content:
-          "You are a helpful assistant that answers questions and messages from discord users. Try answers short but precise.",
+          "You are a helpful assistant that answers questions and messages from discord users. The answers must be short yet precise.",
       },
       {
         role: "user",
