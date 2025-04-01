@@ -47,7 +47,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
     });
 
     //OpenAI's API call for the summary and return it
-    //TODO CHOP THE MESSAGE (WHEN message.length > 2000) INTO MULTIPLE CHUNKS OF MESSAGES
     const completion = await callOpenAiForResume(messagesString);
     await new Promise((resolve) => setTimeout(resolve, 5000));
     await interaction.followUp(completion.choices[0].message.content);
